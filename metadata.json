@@ -7,10 +7,11 @@
     "47",
     "48",
     "49",
-    "50"
+    "50",
+    "51"
   ],
   "url": "https://github.com/eprahemi/window-title-pro-topbar",
   "uuid": "window-title-pro@eprahemi.github.io",
-  "version": 14,
+  "version": 15,
   "settings-schema": "org.gnome.shell.extensions.window-title-pro"
 }

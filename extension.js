@@ -18,6 +18,22 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 
 
+// ── Reduced motion (GNOME 51+) ──
+// GNOME 51 added a system-wide reduced-motion setting (GTK 4.22 parity):
+//     const {reducedMotion} = St.Settings.get();
+// St.Settings and St.ReducedMotion do not exist on GNOME 45-50, so the
+// lookup is guarded and every older shell keeps animating exactly as before.
+function _motion_allowed() {
+    if (!St.Settings || !St.ReducedMotion)
+        return true;
+    try {
+        return St.Settings.get().reducedMotion !== St.ReducedMotion.REDUCE;
+    } catch (e) {
+        return true;
+    }
+}
+
+
 // ── Per-app color map (app name → hex color, ~350 apps) ──
 const APP_COLORS = {
     // ── Browsers (29) ──
@@ -534,6 +550,11 @@ const WindowTitleIndicator = GObject.registerClass(
 
         _fade_in() {
             this.remove_all_transitions();
+            if (!_motion_allowed()) {
+                this.opacity = 255;
+                this.show();
+                return;
+            }
             this.ease({
                 opacity: 255,
                 duration: this._ease_time,
@@ -544,6 +565,11 @@ const WindowTitleIndicator = GObject.registerClass(
 
         _fade_out() {
             this.remove_all_transitions();
+            if (!_motion_allowed()) {
+                this.opacity = 0;
+                this.hide();
+                return;
+            }
             this.ease({
                 opacity: 0,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
@@ -554,6 +580,15 @@ const WindowTitleIndicator = GObject.registerClass(
 
         _sync() {
             this.remove_all_transitions();
+            if (!_motion_allowed()) {
+                this.opacity = 0;
+                this._set_window_app();
+                this._set_window_title();
+                this._update_workspace();
+                this._update_window_count();
+                this._fade_in();
+                return;
+            }
             this.ease({
                 opacity: 0,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,

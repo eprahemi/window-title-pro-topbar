@@ -83,7 +83,11 @@ Open **GNOME Extensions** app → **Window Title Pro Topbar** → gear icon:
 
 ## Supported GNOME Versions
 
-GNOME 45, 46, 47, 48, 49, 50
+GNOME 45, 46, 47, 48, 49, 50, 51
+
+On GNOME 51 the extension honours the system reduced-motion setting
+(GTK 4.22 parity) — the fade animations are skipped when the user asks
+for reduced motion. Older shells are unaffected.
 
 ## Links
 
